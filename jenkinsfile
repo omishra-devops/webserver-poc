@@ -9,21 +9,22 @@ pipeline {
     		    // some block
 		    sh 'pwd;ls '
 		    sh 'cd robot'
+		    sh 'docker build -t robot .'
+                    sh 'chmod 777 testsuites'
+                    sh 'docker run -it -e SERVER_URL=http://3.90.82.12:8080/ -v $PWD/testsuites:/workspace robot '
+                    sh 'pwd; ls -lrt testsuites/results/'
 		}
                 
                 
-                //sh 'docker build -t robot .'
-                //sh 'chmod 777 testsuites'
-                //sh 'docker run -it -e SERVER_URL=http://3.90.82.12:8080/ -v $PWD/testsuites:/workspace robot '
-                //sh 'ls -lrt testsuites/results/'
+
             }
         }
     }
-    //post {
-    //    always {
-    //        junit '/var/lib/jenkins/results/*.xml'
-    //        junit 'testsuites/results/*.xml'
-     //   }
-    //}
+    post {
+        always {
+            junit '/var/lib/jenkins/results/*.xml'
+            junit 'testsuites/results/*.xml'
+        }
+    }
 }
 //checking PR way
