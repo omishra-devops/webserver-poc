@@ -5,21 +5,25 @@ pipeline {
             steps {
                 echo 'I will always say Hello again!'
                 //sh 'git clone '
-                sh 'cd webServerProj '
-                sh 'pwd;ls '
-                sh 'cd robot'
-                sh 'docker build -t robot .'
-                sh 'chmod 777 testsuites'
-                sh 'docker run -it -e SERVER_URL=http://3.90.82.12:8080/ -v $PWD/testsuites:/workspace robot '
-                sh 'ls -lrt testsuites/results/'
+                dir('/var/lib/jenkins/workspace/webServerProj') {
+    		    // some block
+		    sh 'pwd;ls '
+		    sh 'cd robot'
+		}
+                
+                
+                //sh 'docker build -t robot .'
+                //sh 'chmod 777 testsuites'
+                //sh 'docker run -it -e SERVER_URL=http://3.90.82.12:8080/ -v $PWD/testsuites:/workspace robot '
+                //sh 'ls -lrt testsuites/results/'
             }
         }
     }
-    post {
-        always {
-            junit '/var/lib/jenkins/results/*.xml'
-            junit 'testsuites/results/*.xml'
-        }
-    }
+    //post {
+    //    always {
+    //        junit '/var/lib/jenkins/results/*.xml'
+    //        junit 'testsuites/results/*.xml'
+     //   }
+    //}
 }
 //checking PR way
