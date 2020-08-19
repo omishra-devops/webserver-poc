@@ -1,0 +1,91 @@
+---
+- name: Install pre-requisites and set up web server
+  hosts: myhost
+  become: true
+  become_user: root
+  tasks:
+    - name: add nodejs apt key
+      apt_key:
+        url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+        state: present
+    - name: add nodejs repository
+      apt_repository:
+        repo: deb https://deb.nodesource.com/node_14.x {{ ansible_lsb.codename }} main
+        state: present
+        update_cache: yes
+    - name: install nodejs
+      apt:
+        name: nodejs
+        state: present
+    - name: install python-pip
+      apt:
+        name: python-pip
+        state: present
+    - name: Install required Python modules
+      pip:
+        name: flask
+        executable: /usr/bin/pip
+    - name: Install required Python modules
+      pip:
+        name: flask_cors
+        executable: /usr/bin/pip
+    - name: Install required Python modules
+      pip:
+        name: waitress
+        executable: /usr/bin/pip
+    - name: Install "http-server" globally
+      npm:
+        name: http-server
+        global: yes
+    - name: Create a directory if it does not exist
+      file:
+        path: /home/ubuntu/App
+        state: directory
+        mode: '0777' 
+    - git:
+       repo: 'https://github.com/biswajit1987/Angular_With_Flask.git'
+       dest: /home/ubuntu/App/Angular_With_Flask
+       update: yes 
+    - name: Modify mysql server
+      replace:
+        path: /home/ubuntu/App/Angular_With_Flask/main.js
+        regexp: '127.0.0.1:5000'
+        replace: '{{ hostvars["myweb-server"].ansible_host }}:5000' 
+    - name: Change directory to ~/App/Angular and run http server
+      command: nohup http-server 
+      async: 10000
+      poll: 0
+      args:
+         chdir: /home/ubuntu/App/Angular_With_Flask
+    
+    - name: Create a directory if it does not exist
+      file:
+        path: /home/ubuntu/App/server
+        state: directory
+        mode: '0777'
+    - name: Change directory to ~/App/Angular and run move UsersAPI.py
+      command: mv /home/ubuntu/App/Angular_With_Flask/UsersAPI.py  .
+      args:
+         chdir: /home/ubuntu/App/server
+    - name: Modify Test.py to have DB IP
+      replace:
+        path: /home/ubuntu/App/server/UsersAPI.py
+        regexp: "<DB_SERVER>"
+        replace: "{{ hostvars[\"mydb-server\"].ansible_host }}"
+    - name: Modify UsersAPI.py to have webserver ip
+      replace:
+        path: /home/ubuntu/App/server/UsersAPI.py
+        regexp: '<WEB_SERVER>'
+        replace: '{{ hostvars["mydb-server"].ansible_host }}'
+    - name: Change directory to ~/App/Angular and run move UsersAPI.py
+      command: python /home/ubuntu/App/server/UsersAPI.py
+      async: 10000
+      poll: 0
+    - name: giving recurse permission to all files inside App folder
+      file:
+       path: /home/ubuntu/App
+       state: directory
+       mode: '0777'
+       recurse: yes
+    
+...

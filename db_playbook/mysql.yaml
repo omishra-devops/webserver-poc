@@ -1,0 +1,122 @@
+
+ ---
+- name: Install MySQL database server
+  hosts: mydb
+  become: yes
+  become_method: sudo
+  gather_facts: true
+  tags: [database]
+  tasks:
+        - name: Update the software package repository
+          yum:
+                update_cache: yes
+
+        - name: Install MySQL
+          package:
+                name: mysql-server
+                state: latest
+
+        - name: Install MySQL client
+          package:
+                name: mysql-client
+                state: latest
+
+        - name: Install python mysqldb
+          package:
+                 name: python-mysqldb
+                 state: latest
+
+        - name: Update root password
+          mysql_user:
+                name: root
+                host: mydb
+                password: mysql_root_password
+          with_items:
+                - 127.0.0.1
+                - ::1
+                - localhost
+ 
+
+       - name: Delete anonymous MySQL user
+          mysql_user:
+                name: ""
+                host: mydb
+                state: absent
+          with_items:
+                 - localhost
+                 - mydb
+
+  # mysql_secure_installation
+        - name: Delete Hostname based MySQL user
+          mysql_user:
+                name: ""
+                host: mydb
+                state: absent
+
+  # mysql_secure_installation
+        - name: Remove MySQL test database
+          mysql_db:
+                name: test
+                state: absent
+
+  # Enable UFW
+        - name: enable UFW
+          ufw:
+            state: enabled
+            policy: allow
+
+  # Start Mysql database
+        - name: Start mysql
+          service:
+                name: mysql
+                state: started
+
+  # Enable mysql database
+        - name: Enable mysql
+          service:
+                name: mysql
+                enabled: yes
+ 
+ # Change bind address
+        - name: change bind address
+          lineinfile:
+                path: /etc/mysql/mysql.conf.d/mysqld.cnf
+                regexp: "^bind-address(.+)127.0.0.1"
+                line: "bind-address=0.0.0.0"
+
+  # Restart Mysql Service
+        - name: Restart mysql service
+          service:
+                name: mysql
+                state: restarted
+
+  #start mysql databse
+        - name: Start mysql server
+          mysql_user:
+               user: root
+               password: mysql_root_password
+               host: localhost
+
+  # Create a user with name as demo
+        - name: create a user with name demo
+          mysql_user:
+               name: demo
+               host: localhost
+               password: mysql_root_password
+               priv: '*.*:ALL'
+               state: present
+
+        - name: create a user with name demo with mydb host
+          mysql_user:
+                name: demo
+                host: mydb
+                password: mysql_root_password
+                priv: '*.*:ALL'
+                state: present
+
+        - name: Create a new database
+          mysql_db:
+                name: mydatabase
+                state: present
+...
+
