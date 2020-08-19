@@ -22,9 +22,4 @@ pipeline {
         }
     }
 }
-
-
-
-
-
 //checking PR way
