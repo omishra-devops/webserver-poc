@@ -23,8 +23,8 @@ pipeline {
     }
     post {
         always {
-            junit '/var/lib/jenkins/results/*.xml'
-            junit 'testsuites/results/*.xml'
+            //junit '/var/lib/jenkins/results/*.xml'
+            junit 'webServerProj/robot/testsuites/results/*.xml'
         }
     }
 }
