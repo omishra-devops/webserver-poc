@@ -7,7 +7,7 @@ pipeline {
                 dir('/var/lib/jenkins/workspace/webServerProj/robot') {    		 
 		    sh 'docker build -t robot .'
                     sh 'chmod 777 testsuites'
-                    sh 'docker run -e SERVER_URL=http://3.90.82.12:8080/ -v $PWD/testsuites:/workspace robot '                      
+                    sh 'docker run -e SERVER_URL=http://18.191.158.13:8080/ -v $PWD/testsuites:/workspace robot '                      
 		}                        
             }
         }
