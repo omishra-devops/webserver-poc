@@ -1,0 +1,40 @@
+
+pipeline {
+    agent any
+    stages {
+	stage('Build') {
+            steps { 
+                echo 'Hello World -1'
+                echo 'Hello World -2'               
+            }
+        }
+	stage('Deploy') {
+            steps { 
+                echo 'Run this for deploying webserver'
+				//ansiblePlaybook( playbook: '/usr/bin/ansible.yml' )'
+				
+                echo 'Run this for deploying DB Server '
+				//ansiblePlaybook( playbook: '/usr/bin/ansible.yml' )'
+				
+				echo 'Run this for deploying Docker on Test Server '
+				//ansiblePlaybook( playbook: '/usr/bin/ansible.yml' )'
+            }
+        }
+	stage('Test') {
+            steps {
+                echo 'Robot Based Selenium Test Framework Invocation.'              
+                dir('/var/lib/jenkins/workspace/webServerProj/robot') {    		 
+					sh 'docker build -t robot .'
+					sh 'chmod 777 testsuites'
+					sh 'docker run -e SERVER_URL=http://18.191.158.13:8080/ -v $PWD/testsuites:/workspace robot '                      
+				}  
+            }
+        }
+    }
+    post {
+        always {
+            junit 'robot/testsuites/results/*.xml'
+        }
+    }
+}
+
