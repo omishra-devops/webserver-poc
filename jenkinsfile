@@ -24,7 +24,7 @@ pipeline {
     post {
         always {
             //junit '/var/lib/jenkins/results/*.xml'
-            junit 'webServerProj/robot/testsuites/results/*.xml'
+            junit 'robot/testsuites/results/*.xml'
         }
     }
 }
