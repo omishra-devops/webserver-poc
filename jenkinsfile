@@ -3,29 +3,18 @@ pipeline {
     stages {
 	stage('Test') {
             steps {
-                echo 'I will always say Hello again!'
-                //sh 'git clone '
-                dir('/var/lib/jenkins/workspace/webServerProj') {
-    		    // some block
-		    sh 'pwd;ls '
-		    dir('/var/lib/jenkins/workspace/webServerProj/robot') {
-		        sh 'docker build -t robot .'
-                        sh 'chmod 777 testsuites'
-                        sh 'docker run -e SERVER_URL=http://3.90.82.12:8080/ -v $PWD/testsuites:/workspace robot '
-                        sh 'pwd; ls -lrt testsuites/results/'
-		    }
-		}
-                
-                
-
+                echo 'Robot Based Selenium Test Framework Invocation.'              
+                dir('/var/lib/jenkins/workspace/webServerProj/robot') {    		 
+		    sh 'docker build -t robot .'
+                    sh 'chmod 777 testsuites'
+                    sh 'docker run -e SERVER_URL=http://3.90.82.12:8080/ -v $PWD/testsuites:/workspace robot '                      
+		}                        
             }
         }
     }
     post {
         always {
-            //junit '/var/lib/jenkins/results/*.xml'
             junit 'robot/testsuites/results/*.xml'
         }
     }
 }
-//checking PR way
